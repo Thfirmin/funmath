@@ -20,13 +20,15 @@ class Matrix:
         ret += f"\tsize: {self._size}\n"
         return ret
 
+    # if use \t break the function, remove space quantity and add sep itself as space
     def __str__(self):
-        ret = "┌" + ((sum(self._colpad) + (len(self._colpad) + 1)) * ' ') + "┐\n"
+        sep=' '
+        ret = "┌" + ((sum(self._colpad) + 2 + ((len(self._colpad) - 1) * len(sep))) * ' ') + "┐\n"
         for idx in range(self._shape[self.row]):
             rang = idx * self._shape[self.col]
             arr = self._data[rang:rang + self._shape[self.col]]
-            ret += "│ " + " ".join([str(arr[i]).center(self._colpad[i]) for i in range(self._shape[self.col])]) + " │\n"
-        ret += "└" + ((sum(self._colpad) + (len(self._colpad) + 1)) * ' ') + "┘\n"
+            ret += "│ " + sep.join([str(arr[i]).center(self._colpad[i]) for i in range(self._shape[self.col])]) + " │\n"
+        ret += "└" + ((sum(self._colpad) + 2 + ((len(self._colpad) - 1) * len(sep))) * ' ') + "┘\n"
         return ret
 
     def __iter__(self):
@@ -111,9 +113,13 @@ class Matrix:
         return typ
 
     def _get_colpad(self) -> None:
+        new_colpad = []
         if self._size == 0:
-            return []
-        return [len(str(max(self._data[i::self._shape[self.col]]))) for i in range(self._shape[self.col])]
+            return new_colpad
+        for i in range(self._shape[self.col]):
+            sliced = self._data[i::self._shape[self.col]]
+            new_colpad.append(max([len(str(elem)) for elem in sliced]))
+        return new_colpad
 
     def _assert_metadata(self) -> bool:
         if (self._size != len(self._data)):
