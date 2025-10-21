@@ -25,11 +25,18 @@ class Matrix:
         for idx in range(self._shape[self.row]):
             rang = idx * self._shape[self.col]
             arr = self._data[rang:rang + self._shape[self.col]]
-            ret += "│ " + " ".join([str(arr[i]).center(self._colpad[i]) for i in range(self._shape[self.col])]) + " │\n" 
-            #ret += "│ " + " ".join([str(arr[i]).center(self._colpad[i]) for i in range(len(self._colpad))]) + " │\n" 
+            ret += "│ " + " ".join([str(arr[i]).center(self._colpad[i]) for i in range(self._shape[self.col])]) + " │\n"
         ret += "└" + ((sum(self._colpad) + (len(self._colpad) + 1)) * ' ') + "┘\n"
         return ret
-        
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __getitem__(self, idx):
+        start = idx * self._shape[self.col]
+        end = star + self._shape[self.col]
+        return self._data[start:end]
+
     # Constructors
     @staticmethod
     def default():
@@ -57,7 +64,7 @@ class Matrix:
     def retype(self, dtype):
         self._dtype = self._get_type(dtype)
         self._data = [self._dtype(elem) for elem in self._data]
-        
+
     # Getters / Setters
     @property
     def data(self):
@@ -74,7 +81,7 @@ class Matrix:
     @property
     def colpad(self):
         return self._colpad
-        
+
     # Private Methods
     def _data_validation(self, data: list[list[int | float]], dtype: type) -> tuple:
         rows = len(data)
