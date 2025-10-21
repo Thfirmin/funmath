@@ -1,66 +1,122 @@
 import math
 
 class Matrix:
+    _able_types = (int, float)
+    row = 0
+    col = 1
+
     # Built-in Methods
-    __init__(self, m = 0, n = 0, data = []):
-        self._data = []
-        self._colpad = []
-        self._m = m
-        self._n = n
+    def __init__(self, data: list[int | float] = [], dtype: type = int):
+        self.clear()
+        self._init_matrix(data, dtype)
+        self._assert(self._assert_metadata(), ValueError("Invalid matrix metadata"))
+
+    def __repr__(self):
+        ret = f"Matrix({id(self)}):\n"
+        ret += f"\tdata: {self._data}\n"
+        ret += f"\tcolpad: {self._colpad}\n"
+        ret += f"\tshape: {self._shape}\n"
+        ret += f"\tdtype: {self._dtype}\n"
+        ret += f"\tsize: {self._size}\n"
+        return ret
+
+    def __str__(self):
+        ret = "┌" + ((sum(self._colpad) + (len(self._colpad) + 1)) * ' ') + "┐\n"
+        for idx in range(self._shape[self.row]):
+            rang = idx * self._shape[self.col]
+            arr = self._data[rang:rang + self._shape[self.col]]
+            ret += "│ " + " ".join([str(arr[i]).center(self._colpad[i]) for i in range(self._shape[self.col])]) + " │\n" 
+            #ret += "│ " + " ".join([str(arr[i]).center(self._colpad[i]) for i in range(len(self._colpad))]) + " │\n" 
+        ret += "└" + ((sum(self._colpad) + (len(self._colpad) + 1)) * ' ') + "┘\n"
+        return ret
         
+    # Constructors
+    @staticmethod
+    def default():
+        return Matrix()
+
+    @staticmethod
+    def zero(shape: tuple):
+        shape = tuple(shape)
+        return Matrix([[0 for j in range(shape[Matrix.col])] for i in range(shape[Matrix.row])])
+
     # Methods
     def clear(self) -> None:
-        self._data.clear()
-        self._colpad.clear()
-        self._m = 0
-        self._n = 0
+        self._data: list[int | float] = []
+        self._colpad: list[int] = []
+        self._size: int = 0
+        self._shape: tuple = (0, 0)
 
-    def init_matrix(self, data: list[list[int | float]]) -> None:
-        self._assert_matrix(data):
+    def resize(self, shape: tuple):
+        shape = tuple(shape)
+        self._assert(len(shape) == 2, ValueError("Matrix are 2D"))
+        self._assert(self._size == math.prod(shape), ValueError("Invalid new shape"))
+        self._shape = shape
+        self._colpad = self._get_colpad()
+
+    def retype(self, dtype):
+        self._dtype = self._get_type(dtype)
+        self._data = [self._dtype(elem) for elem in self._data]
         
-        self.clear()
-        
-        self._m = len(data)
-        if self._m > 0:
-            self._n = len(data[0])
-            self._colpad = [0 for i in range(self._n)]
-
-        for line in data:
-            self._data.append(line.copy())
-            new_colpad = [len(str(elem)) for elem in line]
-            self._colpad = [max(new_len, old_len) for new_len, old_len in zip(new_colpad, self._colpad)]
-    
-    def init_sized(self, m: int, n: int) -> None:
-        self._assert_msize(m)
-        self._assert_msize(n)
-
     # Getters / Setters
     @property
     def data(self):
         return self._data
-        
-    @data.setter
-    def data(self, mtrix: list[list[int | float]]) -> None:
-        if not self._assert_matrix(mtrix):
-            raise AssertionError("Invalid matrix data: different line sizes")
-        self._m = len(mtrix)
-        if self._m > 0:
-            self._n = len(mtrix[0])
+
+    @property
+    def shape(self):
+        return self._shape
+
+    @property
+    def size(self):
+        return self._size
+
+    @property
+    def colpad(self):
+        return self._colpad
         
     # Private Methods
-    def _assert_matrix(mtrix: any) -> bool:
-        if not (type(mtrix) is list):
+    def _data_validation(self, data: list[list[int | float]], dtype: type) -> tuple:
+        rows = len(data)
+        if rows == 0:
+            return (0, 0)
+        fixed_cols = len(data[0])
+        for arr in data:
+            self._assert(type(arr) is list, ValueError("Invalid matrix structure"))
+            wrong_columns = len([elem for elem in arr if (type(elem) is not dtype)])
+            self._assert(wrong_columns == 0, ValueError("Invalid matrix data type"))
+            self._assert(fixed_cols == len(arr), ValueError("Invalid matrix column size"))
+        return (rows, fixed_cols)
+
+    def _init_matrix(self, data: list[int | float], dtype: type):
+        self._dtype = self._get_type(dtype)
+        self._shape = self._data_validation(data, dtype)
+        self._size = math.prod(self._shape)
+        if self._size > 0:
+            for arr in data:
+                self._data += arr
+        self._colpad = self._get_colpad()
+
+    def _get_type(self, dtype: type):
+        typ = dtype if dtype in self._able_types else None
+        if (typ is None):
+            raise ValueError(f"dtype need to be one of {self._able_types}")
+        return typ
+
+    def _get_colpad(self) -> None:
+        if self._size == 0:
+            return []
+        return [len(str(max(self._data[i::self._shape[self.col]]))) for i in range(self._shape[self.col])]
+
+    def _assert_metadata(self) -> bool:
+        if (self._size != len(self._data)):
             return False
-        if (not len(mtrix)):
-            return True
-        fixed_len = len(mtrix[0])
-        for arr in mtrix:
-            if (len(arr) != fixed_len):
-                return False
-            if (len(filter(lambda i: not (type(i) in (int, float)), arr) > 0)):
-                return False
-                
-    def _assert_msize(size: any) -> bool:
-        if not (type(size) is int):
+        if (self._size != math.prod(self._shape)):
             return False
-        return size > 0
+        if (len(self._shape) != 2):
+            return False
+        return True
+
+    def _assert(self, expr: bool, ex):
+        if (not expr):
+            raise ex
