@@ -20,15 +20,14 @@ class Matrix:
         ret += f"\tsize: {self._size}\n"
         return ret
 
-    # if use \t break the function, remove space quantity and add sep itself as space
     def __str__(self):
         sep=' '
-        ret = "┌" + ((sum(self._colpad) + 2 + ((len(self._colpad) - 1) * len(sep))) * ' ') + "┐\n"
+        ret = "┌ " + sep.join([(elem * ' ') for elem in self._colpad]) + " ┐\n"
         for idx in range(self._shape[self.row]):
             rang = idx * self._shape[self.col]
             arr = self._data[rang:rang + self._shape[self.col]]
             ret += "│ " + sep.join([str(arr[i]).center(self._colpad[i]) for i in range(self._shape[self.col])]) + " │\n"
-        ret += "└" + ((sum(self._colpad) + 2 + ((len(self._colpad) - 1) * len(sep))) * ' ') + "┘\n"
+        ret += "└ " + sep.join([(elem * ' ') for elem in self._colpad]) + " ┘\n"
         return ret
 
     def __iter__(self):
