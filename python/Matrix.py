@@ -38,6 +38,23 @@ class Matrix:
         end = star + self._shape[self.col]
         return self._data[start:end]
 
+    def __mul__(self, other):
+        a_row, a_col = (self._shape[self.row], self._shape[self.col])
+        b_row, b_col = (other.shape[self.row], other.shape[self.col])
+
+        if (a_col != b_row):
+            raise ValueError("Invalid matrix formats")
+        new_matrix = []
+        new_row = []
+        for i in range(a_row):
+            self_row = self._data[(i * a_col):((i * a_col) + a_col)]
+            for j in range(b_col):
+                other_col = other.data[j::b_col]
+                new_row.append(sum([x * y for x, y in zip(self_row, other_col)]))
+            new_matrix.append(new_row.copy())
+            new_row.clear()
+        return Matrix(new_matrix)
+
     # Constructors
     @staticmethod
     def default():

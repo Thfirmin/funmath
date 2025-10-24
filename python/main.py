@@ -1,40 +1,25 @@
 from Matrix import Matrix
 
-mtrix = Matrix([
-    [999999991, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -999999999912],
+mtrixA = Matrix([
+    [1, 2, 3],
+    [4, 5, 6]
 ])
 
-print("1 X 12\n")
-print(mtrix)
-print("\n")
+mtrixB = Matrix([
+    [7, 8],
+    [9, 10],
+    [11, 12]
+])
 
-mtrix.resize((2, 6))
+print("A\n")
+print(mtrixA)
+print("\nX\n")
+print("B\n")
+print(mtrixB)
+print("\n=\n")
 
-print("2 X 6\n")
-print(mtrix)
-print("\n")
+mtrixC = mtrixA * mtrixB
 
-mtrix.resize((3, 4))
-
-print("3 X 4\n")
-print(mtrix)
-print("\n")
-
-mtrix.resize((4, 3))
-
-print("4 X 3\n")
-print(mtrix)
-print("\n")
-
-mtrix.resize((6, 2))
-
-print("6 X 2\n")
-print(mtrix)
-print("\n")
-
-mtrix.resize((12, 1))
-
-print("12 X 1\n")
-print(mtrix)
-print("\n")
+print("C\n")
+print(mtrixC)
 
