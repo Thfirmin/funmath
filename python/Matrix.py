@@ -65,6 +65,12 @@ class Matrix:
         shape = tuple(shape)
         return Matrix([[0 for j in range(shape[Matrix.col])] for i in range(shape[Matrix.row])])
 
+    def init(data: list[int | float], shape: tuple, dtype: type = int):
+        shape = tuple(shape)
+        col = Matrix.col
+        row = Matrix.row
+        return Matrix([data[(i * col):(i * col) + col] for i in range(shape[row])], dtype=dtype)
+
     # Methods
     def clear(self) -> None:
         self._data: list[int | float] = []
@@ -82,6 +88,11 @@ class Matrix:
     def retype(self, dtype):
         self._dtype = self._get_type(dtype)
         self._data = [self._dtype(elem) for elem in self._data]
+
+    def normalize(self):
+        max_value = max(self._data)
+        new_data = [x / max_value for x in self._data]
+        return Matrix.init(new_data, (self._shape[0], self._shape[1]), dtype=float)
 
     # Getters / Setters
     @property

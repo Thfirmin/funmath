@@ -23,3 +23,7 @@ mtrixC = mtrixA * mtrixB
 print("C\n")
 print(mtrixC)
 
+normalized = mtrixC.normalize()
+
+print(normalized.data)
+
